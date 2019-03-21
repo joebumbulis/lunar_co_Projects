@@ -9,10 +9,8 @@ function init(){
   const loseToDealerMessage = 'YOU LOSE: Dealer hand wins';
   const winMessage = 'YOU WIN: Dealer went over 21 and busted!';
 
-  let dealerScore = 0;
-  let playerScore = 0;
-  let playerScoreAlternative = 0;
-  let dealerScoreAlternative = 0;
+  const playersHand = [];
+  const dealersHand = [];
 
   function qs(element) {
     return document.querySelector(element);
@@ -47,13 +45,12 @@ function init(){
 
   function getDeck() {
     const suits = ['spades', 'hearts', 'diamonds', 'clubs'];
-    const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-    const realValue = [[1, 11], 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10];
+    const labels = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
     const deck = new Array();
 
     for (var i = 0; i < suits.length; i++) {
-      for (var x = 0; x < values.length; x++) {
-        let card = { Value: values[x], Suit: suits[i], RealValue: realValue[x]};
+      for (var x = 0; x < labels.length; x++) {
+        let card = { Label: labels[x], Suit: suits[i]};
         deck.push(card);
       }
     }
@@ -104,119 +101,129 @@ function init(){
 
     addCard(cardOne, playerContainer);
     addCard(cardTwo, playerContainer);
+
+    pushCardToHand(cardOne, playersHand);
+    pushCardToHand(cardTwo, playersHand);
   }
 
   function addDealersHand(deck, dealerContainer) {
-    cardOne = deck.shift();
+    card = deck.shift();
 
-    addCard(cardOne, dealerContainer);
+    addCard(card, dealerContainer);
+
+    pushCardToHand(card, dealersHand);
+
+  }
+
+  function pushCardToHand(cardInfo, array) {
+    array.push(cardInfo.Label);
   }
 
   function addCard(cardInfo, container) {
     const card = createElement('div', 'ui card');
-    const value = createElement('div', 'value', cardInfo.Value);
+    const value = createElement('div', 'value', cardInfo.Label);
     const suit = createElement('div', 'suit ' + cardInfo.Suit, cardInfo.Suit);
 
     card.appendChild(value);
     card.appendChild(suit);
 
     container.appendChild(card);
-
-    // pointValue = getCardPointValue(cardInfo.Value)
-    addScore(cardInfo.Value, container);
   }
 
   function addEventHandlers(hitBtn, holdBtn, deck) {
     hitBtn.addEventListener('click', () => {
-      const card = deck.shift();
-      addCard(card, qs('.player_container'));
+      playersTurn(deck);
     });
 
     holdBtn.addEventListener('click', () => {
-      playDealersHand(deck);
+      holdAndPlayDealersTurn(deck);
     });
   }
 
-  function playDealersHand(deck) {
+  function playersTurn(deck) {
+    const card = deck.shift();
+    addCard(card, qs('.player_container'));
+    pushCardToHand(card, playersHand);
+
+    if (checkHandForBust(playersHand)) {
+      addLoseByBust();
+      addStartOverBtn();
+    }
+  }
+
+  function holdAndPlayDealersTurn(deck) {
     newCard = deck.shift();
     addCard(newCard, qs('.dealer_container'));
+    pushCardToHand(newCard, dealersHand);
 
-    checkOverallScores(deck);
-  }
-
-  // function getCardPointValue(cardValue) {
-  //   let value;
-  //
-  //   if (cardValue === 'J' || cardValue === 'Q' || cardValue === 'K') {
-  //     value = 10;
-  //   } else if (cardValue === 'A') {
-  //
-  //   } else {
-  //     value = parseInt(cardValue)
-  //   }
-  //
-  //   return value;
-  // }
-
-  function addScore(value, container) {
-    if (value === 'J' || value === 'Q' || value === 'K') {
-       value = '10';
-     }
-
-    if (container.classList.contains('player_container')) {
-      if (value === 'A') {
-        playerScore += 11;
-        //account for two aces...when adding 11 will bust, just add one.
-        playerScoreAlternative += 1;
-      } else {
-        playerScore += parseInt(value);
-        playerScoreAlternative += parseInt(value);
-      }
-    }
-
-
-
-    if (container.classList.contains('dealer_container')) {
-      if (value === 'A') {
-        dealerScore += parseInt('11');
-        dealerScoreAlternative += parseInt('1');
-      } else {
-        dealerScore += parseInt(value);
-        dealerScoreAlternative += parseInt(value);
-      }
-    }
-
-    checkPlayerScores();
-  }
-
-  function checkPlayerScores() {
-    if (playerScore > 21) {
-      if (playerScoreAlternative > 21) {
-        addLoseByBust();
-        addStartOverBtn();
-      }
-    }
-    console.log('playerScore', playerScore);
-    console.log('playerScoreALT', playerScoreAlternative);
-    console.log('dealerScore', dealerScore);
-    console.log('dealerScoreALT', dealerScoreAlternative);
-  }
-
-  function checkOverallScores(deck) {
-    if (playerScore > 21) playerScore = playerScoreAlternative;
-
-    if (dealerScore > 21) {
-      dealerScore = dealerScoreAlternative;
-    }
-
-    if (dealerScore > 21) {
+    if (checkHandForBust(dealersHand)) {
       addWinByDealerBust();
       addStartOverBtn();
-    } else if (dealerScore < 16 || dealerScore < playerScore) {
-      playDealersHand(deck);
+    } else if (getHandTotal(dealersHand) >= 16){
+      compareHands(deck);
+    } else {
+      holdAndPlayDealersTurn(deck);
+    }
+  }
+
+  function compareHands(deck) {
+    const playersTotal = getHandTotal(playersHand);
+    const dealersTotal = getHandTotal(dealersHand);
+
+    if (playersTotal >= dealersTotal) {
+      holdAndPlayDealersTurn(deck);
     } else {
       addLoseToDealerMessage();
       addStartOverBtn();
+    }
+  }
+
+  function checkHandForBust(hand) {
+    if (didPlayerBust(getHandTotal(hand))) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  function getHandTotal(hand) {
+    let total = 0;
+    const points = convertHandToValuesExceptAce(hand);
+    const pointsSorted = points.sort();
+
+    pointsSorted.forEach((pointValue) => {
+      if (pointValue === 'A') {
+        total += 11;
+        if (total > 21) {
+          total -= 10;
+        }
+      } else {
+        total += pointValue;
+      }
+    });
+
+    return total;
+  }
+
+  function convertHandToValuesExceptAce(hand) {
+    const points = hand.map((label) => {
+      if (label === 'A') {
+        return 'A'
+      } else if (label === 'J' || label === 'Q' || label === 'K') {
+        return 10;
+      } else {
+        return parseInt(label);
+      }
+    })
+
+    return points;
+  }
+
+  function didPlayerBust(total) {
+    if (total > 21) {
+      return true;
+    } else {
+      return false;
     }
   }
 
