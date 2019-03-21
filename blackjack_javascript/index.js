@@ -164,7 +164,7 @@ function init(){
     const playersTotal = getHandTotal(playersHand);
     const dealersTotal = getHandTotal(dealersHand);
 
-    if (playersTotal >= dealersTotal) {
+    if (playersTotal > dealersTotal) {
       holdAndPlayDealersTurn(deck);
     } else {
       addLoseToDealerMessage();
