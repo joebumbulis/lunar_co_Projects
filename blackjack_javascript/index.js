@@ -5,9 +5,11 @@ function init(){
   const BTN_CONTAINER = createElement('div', 'ui button_container');
   const playBtn = createElement('BUTTON',  'ui button', "Shuffle & Deal");
 
-  const loseBustMessage = 'YOU LOSE: You went over 21 and busted!';
-  const loseToDealerMessage = 'YOU LOSE: Dealer hand wins';
-  const winMessage = 'YOU WIN: Dealer went over 21 and busted!';
+  const dealerName = 'Dealer';
+  const playerName = 'Player';
+  const loseBustMessage = `${playerName} LOSES: You went over 21 and busted!`;
+  const loseToDealerMessage = `${playerName} LOSES: Dealer hand wins`;
+  const winMessage = `${playerName} WINS: Dealer went over 21 and busted!`;
 
   const playersHand = [];
   const dealersHand = [];
@@ -54,7 +56,7 @@ function init(){
         deck.push(card);
       }
     }
-    console.table(deck);
+
     return deck;
   }
 
@@ -85,8 +87,8 @@ function init(){
 
   function renderDeal(deck) {
     container.innerHTML = '';
-    const dealerContainer = createElement('div', 'dealer_container',  'Dealer:');
-    const playerContainer = createElement('div', 'player_container', 'Player:');
+    const dealerContainer = createElement('div', 'dealer_container',  `${dealerName}:`);
+    const playerContainer = createElement('div', 'player_container', `${playerName}:`);
 
     container.appendChild(dealerContainer);
     container.appendChild(playerContainer);
@@ -96,23 +98,19 @@ function init(){
   }
 
   function addPlayersHand(deck, playerContainer) {
-    cardOne = deck.shift();
-    cardTwo = deck.shift();
+    dealCard(deck, playerContainer, playersHand);
+    dealCard(deck, playerContainer, playersHand);
+  }
 
-    addCard(cardOne, playerContainer);
-    addCard(cardTwo, playerContainer);
+  function dealCard(deck, container, hand) {
+    const card = deck.shift();
 
-    pushCardToHand(cardOne, playersHand);
-    pushCardToHand(cardTwo, playersHand);
+    addCard(card, container);
+    pushCardToHand(card, hand);
   }
 
   function addDealersHand(deck, dealerContainer) {
-    card = deck.shift();
-
-    addCard(card, dealerContainer);
-
-    pushCardToHand(card, dealersHand);
-
+    dealCard(deck, dealerContainer, dealersHand);
   }
 
   function pushCardToHand(cardInfo, array) {
@@ -141,9 +139,7 @@ function init(){
   }
 
   function playersTurn(deck) {
-    const card = deck.shift();
-    addCard(card, qs('.player_container'));
-    pushCardToHand(card, playersHand);
+    dealCard(deck, qs('.player_container'), playersHand);
 
     if (checkHandForBust(playersHand)) {
       addLoseByBust();
@@ -152,9 +148,7 @@ function init(){
   }
 
   function holdAndPlayDealersTurn(deck) {
-    newCard = deck.shift();
-    addCard(newCard, qs('.dealer_container'));
-    pushCardToHand(newCard, dealersHand);
+    dealCard(deck, qs('.dealer_container'), dealersHand);
 
     if (checkHandForBust(dealersHand)) {
       addWinByDealerBust();
@@ -179,16 +173,12 @@ function init(){
   }
 
   function checkHandForBust(hand) {
-    if (didPlayerBust(getHandTotal(hand))) {
-      return true;
-    } else {
-      return false;
-    }
+    return didPlayerBust(getHandTotal(hand))
   }
 
   function getHandTotal(hand) {
     let total = 0;
-    const points = convertHandToValuesExceptAce(hand);
+    const points = convertHandLabelsToValuesExceptAce(hand);
     const pointsSorted = points.sort();
 
     pointsSorted.forEach((pointValue) => {
@@ -205,10 +195,10 @@ function init(){
     return total;
   }
 
-  function convertHandToValuesExceptAce(hand) {
+  function convertHandLabelsToValuesExceptAce(hand) {
     const points = hand.map((label) => {
       if (label === 'A') {
-        return 'A'
+        return 'A';
       } else if (label === 'J' || label === 'Q' || label === 'K') {
         return 10;
       } else {
@@ -220,11 +210,7 @@ function init(){
   }
 
   function didPlayerBust(total) {
-    if (total > 21) {
-      return true;
-    } else {
-      return false;
-    }
+    if (total > 21) return true;
   }
 
   function addLoseByBust() {
@@ -241,7 +227,21 @@ function init(){
 
   function addGameEndingMessage(message) {
     const bustMessaging = createElement('div', '', message);
-    BTN_CONTAINER.parentNode.replaceChild(bustMessaging, BTN_CONTAINER);
+    BTN_CONTAINER.parentNode.replaceChild(bustMessaging, BTN_CONTAINER)
+    addFinalScoreMessage();
+  }
+
+  function addFinalScoreMessage() {
+    const playersTotal = getHandTotal(playersHand);
+    const dealersTotal = getHandTotal(dealersHand);
+    const messageContainer = createElement('div', 'ui final-container');
+    const dealerFinalScoreMessage = createElement('div', 'dealer-score', `${dealerName}: ${dealersTotal}`);
+    const playerFinalScoreMessage = createElement('div', 'dealer-score', `${playerName}: ${playersTotal}`);
+
+    messageContainer.appendChild(dealerFinalScoreMessage)
+    messageContainer.appendChild(playerFinalScoreMessage)
+
+    container.appendChild(messageContainer)
   }
 
   function addStartOverBtn() {
