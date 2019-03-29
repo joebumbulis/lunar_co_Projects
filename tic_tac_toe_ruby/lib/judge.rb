@@ -17,19 +17,22 @@ class Judge
     @board = game.board
   end
 
-  def check_for_win?(player)
-    WINNING_COMBOS.each do |win_combo|
+  def check_for_game_ending_move(player)
+    declare_winner(player.n ame) if win?(player.token)
+
+    finish_game if there_is_no_winner
+  end
+
+  def win?(token)
+    WINNING_COMBOS.any? do |win_combo|
       index_0 = win_combo[0]
       index_1 = win_combo[1]
       index_2 = win_combo[2]
 
-      if @board.spaces[index_0] == player.token && @board.spaces[index_1] == player.token && @board.spaces[index_2] == player.token
-        declare_winner(player)
-        return true
-      end
+      @board.spaces[index_0] == token &&
+      @board.spaces[index_1] == token &&
+      @board.spaces[index_2] == token
     end
-
-    finish_game if there_is_no_winner
   end
 
   def there_is_no_winner
@@ -42,9 +45,9 @@ class Judge
      game.try_again
    end
 
-  def declare_winner(player)
+  def declare_winner(name)
     @board.print_board
-    Messages.win(player.name)
+    Messages.win(name)
     game.try_again
   end
 end

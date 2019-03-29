@@ -1,5 +1,3 @@
-# require 'enumerator'
-
 class Board
   attr_accessor :spaces
 

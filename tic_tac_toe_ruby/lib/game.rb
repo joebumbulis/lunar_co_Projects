@@ -9,11 +9,11 @@ class Game
 
   def initialize
     @board = Board.new
+    @judge = Judge.new(self)
     @players = 1
     @player1 = Player.new("Player 1", "X")
     @player2 = Player.new("Player 2", "O")
-    @computer = Computer.new("Computer", "O", @board)
-    @judge = Judge.new(self)
+    @computer = Computer.new("Computer", "O", @board, @player1)
   end
 
   def set_up
@@ -62,7 +62,7 @@ class Game
     position = ask_for_position(player1)
     player1.place_position_in_moves(position)
     @board.update_spaces_with_moves(player1)
-    @judge.check_for_win?(player1)
+    @judge.check_for_game_ending_move(player1)
   end
 
   def second_turn
@@ -70,9 +70,9 @@ class Game
       position = ask_for_position(player2)
       player2.place_position_in_moves(position)
       @board.update_spaces_with_moves(player2)
-      @judge.check_for_win?(player1)
+      @judge.check_for_game_ending_move(player2)
     else
-      @computer.play_turn
+      @computer.play_turn(@judge)
     end
   end
 
