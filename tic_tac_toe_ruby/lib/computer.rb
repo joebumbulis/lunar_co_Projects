@@ -3,15 +3,24 @@ require_relative './ai'
 class Computer < Player
   include AI
   attr_reader :token
+  attr_accessor :win_combos_available
 
   def initialize(name, token, board, human)
     super(name, token)
     @board = board
     @human = human
+    @win_combos_available = Board::WINNING_COMBOS
+  end
+
+  def remove_win_combos(position)
+    positon_index = position.to_i - 1
+    
+    @win_combos_available.reject! do | combo |
+      combo.include?(positon_index)
+    end
   end
 
   def play_turn(judge)
-    puts "Computer's Turn"
     sleep rand(1..2) * 0.5
     position = self.get_position
     self.place_position_in_moves(position)

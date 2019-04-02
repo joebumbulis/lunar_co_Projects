@@ -18,10 +18,14 @@ class Judge
       index_1 = win_combo[1]
       index_2 = win_combo[2]
 
-      @board.spaces[index_0] == token &&
-      @board.spaces[index_1] == token &&
-      @board.spaces[index_2] == token
+      does_player_have_position?(index_0, token) &&
+      does_player_have_position?(index_1, token) &&
+      does_player_have_position?(index_2, token)
     end
+  end
+
+  def does_player_have_position?(index, token)
+      @board.spaces[index] == token
   end
 
   def there_is_no_winner

@@ -63,6 +63,7 @@ class Game
     player1.place_position_in_moves(position)
     @board.update_spaces_with_moves(player1)
     @judge.check_for_game_ending_move(player1)
+    @computer.remove_win_combos(position)
   end
 
   def second_turn
@@ -71,6 +72,7 @@ class Game
       player2.place_position_in_moves(position)
       @board.update_spaces_with_moves(player2)
       @judge.check_for_game_ending_move(player2)
+      @computer.remove_win_combos(position)
     else
       @computer.play_turn(@judge)
     end

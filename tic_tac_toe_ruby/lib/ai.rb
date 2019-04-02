@@ -25,23 +25,38 @@ module AI
   end
 
   def find_best_position
-    @position = check_for_necessary_move(@human.token)
-    @position = check_for_necessary_move(self.token) unless @position
+    @position = check_and_get_necessary_move(@human.token)
+    @position = check_and_get_necessary_move(self.token) unless @position
+    @position = find_best_open_position unless @position
     @position.to_s
   end
 
-  def check_for_necessary_move(token)
+  def find_best_open_position
+    open_board_spaces = @board.spaces.select{|space| space.match(/\d/)}
+
+    if one_space_left?(open_board_spaces)
+      open_board_spaces.pop()
+    end
+  end
+
+  def check_and_get_necessary_move(token)
     Board::WINNING_COMBOS.each do |win_combo|
       index_0 = win_combo[0]
       index_1 = win_combo[1]
       index_2 = win_combo[2]
 
       if does_player_have_position?(index_0, token) && does_player_have_position?(index_1, token)
-        @position = index_2 + 1
+        if @board.is_position_available?(index_2)
+          @position = index_2 + 1
+        end
       elsif does_player_have_position?(index_0, token) && does_player_have_position?(index_2, token)
-        @position = index_1 + 1
+        if @board.is_position_available?(index_1)
+          @position = index_1 + 1
+        end
       elsif does_player_have_position?(index_1, token) && does_player_have_position?(index_2, token)
-        @position = index_0 + 1
+        if @board.is_position_available?(index_1)
+          @position = index_0 + 1
+        end
       end
     end
     return @position
@@ -51,4 +66,9 @@ module AI
       @board.spaces[index] == token
   end
 
+  def one_space_left?(open_board_spaces)
+    if open_board_spaces.length <= 1
+      true
+    end
+  end
 end
