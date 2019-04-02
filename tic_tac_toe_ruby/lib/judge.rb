@@ -1,30 +1,19 @@
 class Judge
   attr_reader :game, :board
 
-  WINNING_COMBOS = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [6, 4, 2]
-  ]
-
   def initialize(game)
     @game = game
     @board = game.board
   end
 
   def check_for_game_ending_move(player)
-    declare_winner(player.n ame) if win?(player.token)
+    declare_winner(player.name) if win?(player.token)
 
     finish_game if there_is_no_winner
   end
 
   def win?(token)
-    WINNING_COMBOS.any? do |win_combo|
+    Board::WINNING_COMBOS.any? do |win_combo|
       index_0 = win_combo[0]
       index_1 = win_combo[1]
       index_2 = win_combo[2]
