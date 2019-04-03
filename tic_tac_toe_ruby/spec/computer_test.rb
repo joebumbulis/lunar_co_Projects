@@ -22,4 +22,8 @@ class ComputerTest < Minitest::Test
       ],
       @computer.remove_win_combos("1")
   end
+
+  def test_computer_win_available_positions
+    assert_equal 5, @computer.check_for_win_combo_position
+  end
 end

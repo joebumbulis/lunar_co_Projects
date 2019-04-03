@@ -37,6 +37,23 @@ module AI
     if one_space_left?(open_board_spaces)
       open_board_spaces.pop()
     end
+
+    check_for_win_combo_position
+  end
+
+  def check_for_win_combo_position
+    @win_combos_available.map do |combo|
+      self.moves.map do |move|
+        move_index = move.to_i - 1
+
+        if combo.include?(move_index)
+          open_moves = combo.reject{|pos| pos == move}
+          return open_moves.pop()
+        end
+    end
+  end
+
+
   end
 
   def check_and_get_necessary_move(token)
@@ -44,6 +61,7 @@ module AI
       index_0 = win_combo[0]
       index_1 = win_combo[1]
       index_2 = win_combo[2]
+
 
       if does_player_have_position?(index_0, token) && does_player_have_position?(index_1, token)
         if @board.is_position_available?(index_2)
@@ -54,7 +72,7 @@ module AI
           @position = index_1 + 1
         end
       elsif does_player_have_position?(index_1, token) && does_player_have_position?(index_2, token)
-        if @board.is_position_available?(index_1)
+        if @board.is_position_available?(index_0)
           @position = index_0 + 1
         end
       end

@@ -37,4 +37,5 @@ class BoardTest < Minitest::Test
     open_board_spaces = @board.spaces.select{|space| space.match(/\d/)}
     assert_equal true , @computer_two.one_space_left?(open_board_spaces)
   end
+
 end

@@ -9,14 +9,14 @@ class Computer < Player
     super(name, token)
     @board = board
     @human = human
-    @win_combos_available = Board::WINNING_COMBOS
+    @win_combos_available = Board::WINNING_COMBOS.dup
   end
 
   def remove_win_combos(position)
-    positon_index = position.to_i - 1
-    
+    position_index = position.to_i - 1
+
     @win_combos_available.reject! do | combo |
-      combo.include?(positon_index)
+      combo.include?(position_index)
     end
   end
 
