@@ -7,7 +7,6 @@ class Card
   end
 
   def output_card
-    # puts "The #{@label} of #{@suit}"
     puts ''
     puts '  ___________  '
     puts ' /           \ '

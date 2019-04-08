@@ -1,15 +1,15 @@
 require_relative './messages'
 
 class Player
+  BUST_VALUE = 21
   attr_accessor :hand
 
   def initialize
     @hand = []
-    @bust_value = 21
   end
 
   def deal(deck_cards, number)
-    number.times {@hand << deck_cards.cards.shift}
+    number.times { @hand << deck_cards.cards.shift }
   end
 
   def render_deal(is_hidden = false)
@@ -23,30 +23,30 @@ class Player
     end
   end
 
-  def check_for_bust
-    get_hand_total_value > @bust_value ? true : false;
+  def check_for_bust?
+    get_hand_total_value > BUST_VALUE
   end
 
   def get_hand_total_value
     total = 0;
     points = convert_labels_to_points_except_aces(@hand)
 
-    points.each { |value|
+    points.each do |value|
       if value == "A"
         total += 11
-        if total > 21
+        if total > BUST_VALUE
           total -= 10
         end
       else
         total += value
       end
-    }
+    end
 
     return total
   end
 
   def convert_labels_to_points_except_aces(hand)
-    points = hand.map { |card|
+    points = hand.map do |card|
       if card.label == 'A'
         'A'
       elsif card.label === 'J' || card.label === 'Q' || card.label === 'K'
@@ -54,8 +54,6 @@ class Player
       else
         card.label.to_i
       end
-    }
-
+    end
   end
-
 end

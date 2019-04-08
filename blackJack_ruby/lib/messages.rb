@@ -15,6 +15,14 @@ module Messages
     puts "Wrong Input, Please press Y or N then ENTER"
   end
 
+  def self.hit_or_stay
+    puts "Do you want to HIT (H) or STAY (S)?"
+  end
+
+  def self.wrong_turn_input
+    puts "Wrong Input, Please press H or S then ENTER"
+  end
+
   def self.dealerHandMessage
     puts "DEALER HAND:"
   end

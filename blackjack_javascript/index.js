@@ -198,7 +198,7 @@ function init(){
   function convertHandLabelsToValuesExceptAce(hand) {
     const points = hand.map((label) => {
       if (label === 'A') {
-        return 'A';
+        return 'A'
       } else if (label === 'J' || label === 'Q' || label === 'K') {
         return 10;
       } else {

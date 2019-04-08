@@ -3,7 +3,7 @@ require_relative './deck'
 require_relative './player'
 
 class Game
-  def initialize()
+  def initialize
       @deck_cards = Deck.new
       @dealer = Player.new
       @participant = Player.new
@@ -21,7 +21,7 @@ class Game
 
   def ask_to_play
     Messages.play_message
-    command = gets.chomp
+    command = get_input
     valid = false
 
     while(!valid)
@@ -29,7 +29,7 @@ class Game
         valid = true
       else
         Messages.wrong_play_input
-        command = gets.chomp
+        command = get_input
       end
     end
 
@@ -66,16 +66,16 @@ class Game
   end
 
   def participant_turn
-    puts "Do you want to HIT (H) or STAY (S)?"
-    command = gets.chomp
+    Messages.hit_or_stay
+    command = get_input
     valid = false
 
     while(!valid)
       if command == "H" or command == "S"
         valid = true
       else
-       puts "Wrong Input, Please press H or S then ENTER"
-        command = gets.chomp
+       Messages.wrong_turn_input
+       command = get_input
       end
     end
 
@@ -88,11 +88,11 @@ class Game
 
   def hit
     @participant.deal(@deck_cards, 1)
-    @participant.check_for_bust ? end_game_participant_bust : play_round
+    @participant.check_for_bust? ? end_game_participant_bust : play_round
   end
 
   def dealers_turn
-    if @dealer.check_for_bust
+    if @dealer.check_for_bust?
       end_game_dealer_bust
     elsif @dealer.get_hand_total_value >= 16
       compare_hands
@@ -102,8 +102,12 @@ class Game
     end
   end
 
+  def participant_leading?
+    @participant.get_hand_total_value > @dealer.get_hand_total_value
+  end
+
   def compare_hands
-    if @participant.get_hand_total_value > @dealer.get_hand_total_value
+    if participant_leading?
       @dealer.deal(@deck_cards, 1)
       dealers_turn
     else
@@ -112,25 +116,33 @@ class Game
   end
 
   def end_game_participant_bust
-    render_hands
-    add_scores
+    end_of_game
     Messages.participant_bust_message
   end
 
   def end_game_dealer_bust
-    render_hands
-    add_scores
+    end_of_game
     Messages.dealer_bust_message
   end
 
   def end_game_dealer_wins
-    render_hands
-    add_scores
+    end_of_game
     Messages.dealer_wins_message
   end
 
   def add_scores
     puts "Dealer total: #{@dealer.get_hand_total_value}"
     puts "Your total: #{@participant.get_hand_total_value}"
+  end
+
+  private
+
+  def get_input
+    gets.chomp.upcase
+  end
+
+  def end_of_game
+    render_hands
+    add_scores
   end
 end

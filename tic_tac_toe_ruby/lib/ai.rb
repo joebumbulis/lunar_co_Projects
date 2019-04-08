@@ -38,7 +38,9 @@ module AI
       open_board_spaces.pop()
     end
 
+
     check_for_win_combo_position
+    # random_move
   end
 
   def check_for_win_combo_position
@@ -61,24 +63,33 @@ module AI
       index_0 = win_combo[0]
       index_1 = win_combo[1]
       index_2 = win_combo[2]
-
-
+      ``
       if does_player_have_position?(index_0, token) && does_player_have_position?(index_1, token)
-        if @board.is_position_available?(index_2)
+        # if @board.is_position_available?(index_2)
           @position = index_2 + 1
-        end
+        # end
       elsif does_player_have_position?(index_0, token) && does_player_have_position?(index_2, token)
-        if @board.is_position_available?(index_1)
+        # if @board.is_position_available?(index_1)
           @position = index_1 + 1
-        end
+        # end
       elsif does_player_have_position?(index_1, token) && does_player_have_position?(index_2, token)
-        if @board.is_position_available?(index_0)
+        # if @board.is_position_available?(index_0)
           @position = index_0 + 1
-        end
+        # end
       end
     end
     return @position
   end
+
+  # def random_move(index = 0)
+  #   space = @board.spaces[index]
+  #   if @board.is_position_available?(space)
+  #     space
+  #   else
+  #     random_move(index + 1)
+  #   end
+  # end
+
 
   def does_player_have_position?(index, token)
       @board.spaces[index] == token
